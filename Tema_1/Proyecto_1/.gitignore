@@ -1,0 +1,116 @@
+# =========================================================
+# Python
+# =========================================================
+
+# Bytecode compilado / caché
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Extensiones C
+*.so
+
+# Distribución / empaquetado
+build/
+dist/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+pip-wheel-metadata/
+
+# Logs de instalación de pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# =========================================================
+# Entornos virtuales
+# =========================================================
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.python-version
+
+# =========================================================
+# Pruebas, cobertura y herramientas de calidad
+# =========================================================
+.pytest_cache/
+.cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.cover
+*.py,cover
+nosetests.xml
+.tox/
+.nox/
+.hypothesis/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+.ruff_cache/
+
+# =========================================================
+# Jupyter / IPython
+# =========================================================
+.ipynb_checkpoints/
+profile_default/
+ipython_config.py
+
+# =========================================================
+# Secretos y configuración local (NUNCA subir)
+# =========================================================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Streamlit: secretos locales
+.streamlit/secrets.toml
+
+# =========================================================
+# Editores e IDEs
+# =========================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# =========================================================
+# Sistema operativo
+# =========================================================
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# =========================================================
+# Logs y temporales
+# =========================================================
+*.log
+*.tmp

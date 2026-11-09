@@ -1,0 +1,71 @@
+.box {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: clamp(3rem, 2rem + 5vw, 6rem) clamp(1.25rem, 1rem + 4vw, 5rem);
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(124, 108, 255, 0.35);
+  background: radial-gradient(120% 140% at 50% 0%, rgba(124, 108, 255, 0.35) 0%, rgba(16, 22, 42, 0.95) 55%),
+    var(--color-surface);
+  box-shadow: 0 40px 120px -40px rgba(124, 108, 255, 0.55);
+}
+
+/* Rejilla sutil de fondo */
+.box::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 0%, #000, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 0%, #000, transparent 75%);
+}
+
+.glow {
+  position: absolute;
+  z-index: -1;
+  width: 420px;
+  height: 420px;
+  bottom: -260px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: rgba(34, 211, 238, 0.35);
+  filter: blur(100px);
+}
+
+.title {
+  font-size: var(--fs-h2);
+  max-width: 760px;
+  text-wrap: balance;
+}
+
+.subtitle {
+  margin-top: var(--space-4);
+  max-width: 580px;
+  font-size: var(--fs-lg);
+  color: var(--color-text-muted);
+  text-wrap: pretty;
+}
+
+.button {
+  margin-top: var(--space-6);
+}
+
+.note {
+  margin-top: var(--space-4);
+  font-size: var(--fs-sm);
+  color: var(--color-text-subtle);
+}
+
+@media (max-width: 520px) {
+  .button {
+    width: 100%;
+  }
+}

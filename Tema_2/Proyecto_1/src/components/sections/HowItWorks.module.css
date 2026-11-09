@@ -1,0 +1,116 @@
+.steps {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-5);
+  position: relative;
+}
+
+/* Línea que une los pasos (solo desktop) */
+.steps::before {
+  content: '';
+  position: absolute;
+  top: 32px;
+  left: 8%;
+  right: 8%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-border-strong) 15%, var(--color-border-strong) 85%, transparent);
+}
+
+.step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0 var(--space-2);
+}
+
+.number {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: var(--space-5);
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #fff;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 50%;
+  box-shadow: 0 0 0 6px var(--color-bg), 0 0 40px -8px rgba(124, 108, 255, 0.6);
+  position: relative;
+  isolation: isolate; /* mantiene el ::before degradado dentro del círculo */
+}
+.number::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: var(--gradient-brand);
+  z-index: -1;
+}
+
+.title {
+  font-size: 1.5rem;
+  margin-bottom: var(--space-3);
+}
+
+.text {
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+}
+
+.detail {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding: 5px 12px;
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--color-accent);
+  background: rgba(34, 211, 238, 0.08);
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  border-radius: var(--radius-pill);
+}
+
+.cta {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-8);
+}
+
+@media (max-width: 860px) {
+  .steps {
+    grid-template-columns: 1fr;
+    gap: var(--space-7);
+    max-width: 520px;
+    margin-inline: auto;
+  }
+  .steps::before {
+    top: 32px;
+    bottom: 32px;
+    left: calc(var(--space-2) + 32px);
+    right: auto;
+    width: 1px;
+    height: auto;
+    background: var(--color-border-strong);
+  }
+  .step {
+    padding-left: calc(64px + var(--space-5) + var(--space-2));
+  }
+  .number {
+    position: absolute;
+    left: var(--space-2);
+    top: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .cta > * {
+    width: 100%;
+    white-space: normal;
+    text-align: center;
+  }
+}

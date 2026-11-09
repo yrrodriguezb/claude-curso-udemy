@@ -1,0 +1,222 @@
+.hero {
+  position: relative;
+  padding-top: calc(var(--nav-height) + clamp(3rem, 2rem + 4vw, 6rem));
+  padding-bottom: var(--space-8);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* ---------- Fondo ---------- */
+.bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.grid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(148, 163, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 255, 0.06) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 30%, transparent 75%);
+}
+
+.glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.55;
+}
+.glowA {
+  width: 560px;
+  height: 560px;
+  top: -180px;
+  left: -120px;
+  background: radial-gradient(circle, rgba(124, 108, 255, 0.55), transparent 70%);
+}
+.glowB {
+  width: 520px;
+  height: 520px;
+  top: 80px;
+  right: -160px;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.35), transparent 70%);
+}
+
+/* ---------- Layout ---------- */
+.inner {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  align-items: center;
+  gap: clamp(2.5rem, 1rem + 4vw, 4.5rem);
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  animation: fadeUp 900ms var(--ease) both;
+}
+
+/* ---------- Badge ---------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px 14px 6px 10px;
+  margin-bottom: var(--space-5);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  background: rgba(124, 108, 255, 0.1);
+  border: 1px solid rgba(124, 108, 255, 0.3);
+  border-radius: var(--radius-pill);
+  transition: border-color var(--dur), color var(--dur);
+}
+.badge:hover {
+  color: var(--color-text);
+  border-color: rgba(124, 108, 255, 0.6);
+}
+
+.badgeDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-success);
+  box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.6);
+  animation: pulse 2.2s infinite;
+}
+
+/* ---------- Texto ---------- */
+.title {
+  font-size: var(--fs-h1);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.04;
+  text-wrap: balance;
+}
+
+.subtitle {
+  margin-top: var(--space-5);
+  max-width: 560px;
+  font-size: var(--fs-lg);
+  color: var(--color-text-muted);
+  text-wrap: pretty;
+}
+
+.ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.trust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin-top: var(--space-5);
+  font-size: var(--fs-sm);
+  color: var(--color-text-muted);
+}
+.trust li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.trust svg {
+  color: var(--color-success);
+}
+
+.visual {
+  animation: fadeUp 1100ms 150ms var(--ease) both;
+}
+
+/* ---------- Integraciones ---------- */
+.integrations {
+  margin-top: clamp(3.5rem, 2rem + 5vw, 6rem);
+  text-align: center;
+}
+.integrations p {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+  margin-bottom: var(--space-5);
+}
+.integrations ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-4) clamp(1.5rem, 1rem + 2vw, 3rem);
+}
+.integrations li {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--color-text-subtle);
+  letter-spacing: -0.01em;
+  transition: color var(--dur);
+}
+.integrations li:hover {
+  color: var(--color-text);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1020px) {
+  .inner {
+    grid-template-columns: 1fr;
+  }
+  .copy {
+    align-items: center;
+    text-align: center;
+  }
+  .subtitle {
+    margin-inline: auto;
+  }
+  .ctas,
+  .trust {
+    justify-content: center;
+  }
+  .visual {
+    max-width: 620px;
+    width: 100%;
+    margin-inline: auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .ctas {
+    flex-direction: column;
+    width: 100%;
+  }
+  .ctas > * {
+    width: 100%;
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(52, 211, 153, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+  }
+}
