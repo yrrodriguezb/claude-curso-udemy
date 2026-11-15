@@ -1,0 +1,59 @@
+----- Prompt 1 -----
+
+Analiza el estado actual de la API de Snap:
+1. ¿Qué endpoints existen y qué responde cada uno?
+2. ¿Qué formato tienen las respuestas JSON?
+3. ¿Cómo funciona la autenticación (qué headers espera)?
+4. ¿Qué datos devuelve el dashboard?
+
+Necesito esta info para planificar una interfaz web.
+
+
+----- Prompt 2 -----
+
+Quiero añadir una interfaz web para Snap. Propón 3 opciones:
+- HTML + vanilla JS servido por Express
+- React como SPA separada
+- Un template engine como EJS o Handlebars
+
+Para cada una: pros, contras, y cuánto cambia la estructura
+actual del proyecto. No implementes nada.
+
+
+----- Prompt 3 -----
+
+Me gusta la opción [X]. Muéstrame el plan detallado:
+qué archivos crear, qué páginas/vistas necesito, y cómo
+se conecta con la API existente. No implementes nada.
+
+
+----- Prompt 4 -----
+
+Implementa SOLO la página de login y registro.
+Debe conectarse a POST /auth/login y POST /auth/register.
+Guardar el token y redirigir al dashboard si es exitoso.
+Mostrar errores claros si falla.
+
+Verificación: arranca el servidor y muéstrame que puedo
+registrar un usuario y hacer login.
+
+
+----- Prompt 5 -----
+
+Ahora implementa la vista del dashboard. Debe:
+- Mostrar las URLs del usuario con sus estadísticas
+- Permitir crear una nueva URL (con alias opcional)
+- Requerir autenticación (redirigir a login si no hay token)
+
+Verificación: con un usuario logueado, debo ver mis URLs
+y poder crear una nueva.
+
+
+----- Prompt 6 -----
+
+Revisa la interfaz completa. Verifica que:
+- El logout funciona y limpia el token
+- Las URLs expiradas se muestran diferente
+- Los errores se muestran de forma clara al usuario
+Ejecuta todos los tests. Actualiza docs/API.md si es necesario.
+Haz commit con Conventional Commits.

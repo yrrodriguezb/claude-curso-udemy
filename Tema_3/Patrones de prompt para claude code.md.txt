@@ -1,0 +1,320 @@
+Lectura: Patrones de prompt para Claude Code
+Claude Code es un agente que toma decisiones: qué archivos leer, qué enfoque seguir, qué herramientas usar. La calidad de esas decisiones depende directamente de la calidad de tus instrucciones. Este artículo recoge los patrones de prompt más útiles para el trabajo diario con Claude Code, todos construidos sobre una misma estructura.
+
+La estructura detrás de cada patrón
+Todo prompt profesional se compone de hasta cinco piezas:
+
+Contexto: Qué necesita saber Claude de la situación.
+
+Tarea: Qué tiene que hacer exactamente.
+
+Restricciones: Qué no debe hacer o qué límites tiene.
+
+Formato: Cómo quieres el resultado.
+
+Verificación: Cómo confirmar que está bien.
+
+No todos los prompts necesitan las cinco. Un fix rápido puede necesitar solo tarea y verificación. Pero cuando el resultado no es el esperado, casi siempre falta una de estas piezas. Cada patrón de este artículo es una forma concreta de combinar estos componentes para un tipo de tarea específico.
+
+
+
+1. Implementar una feature
+El patrón más frecuente. Quieres añadir funcionalidad nueva a un proyecto existente.
+
+Esquema
+Contexto: [Qué proyecto es, qué stack usa, qué existe ya]
+ 
+Tarea: Implementa [feature] con estos requisitos:
+- [requisito concreto 1]
+- [requisito concreto 2]
+- [requisito concreto 3]
+ 
+Restricciones:
+- [qué no cambiar]
+- [patrones del proyecto a respetar]
+- [dependencias que no instalar]
+ 
+Verificación: [tests a crear y ejecutar, o comando para comprobar]
+
+
+Ejemplo
+Contexto: Snap es un acortador de URLs. Express + TypeScript + SQLite.
+Ya tiene endpoints de creación y redirect de URLs funcionando.
+ 
+Tarea: Implementa tracking de clicks. Cada vez que alguien visita
+un código corto y es redirigido, registra el click con timestamp,
+IP y user-agent. Añade un endpoint para que el dueño de una URL
+pueda consultar el total de clicks y un desglose por día de los
+últimos 7 días.
+ 
+Restricciones:
+- El redirect no debe volverse más lento. Registra el click
+  después de enviar la respuesta al usuario.
+- Sigue la misma estructura de módulos que ya tiene el proyecto.
+- No cambies la interfaz de los endpoints existentes.
+ 
+Verificación: Escribe tests que cubran el registro de clicks
+y la consulta de estadísticas. Ejecuta todos los tests del
+proyecto al terminar.
+
+
+Por qué funciona
+El contexto evita que Claude invente una estructura propia. Los requisitos son concretos y contables (puedes verificar cada uno). Las restricciones protegen lo que ya funciona. Y la verificación cierra el ciclo: si los tests no pasan, Claude lo sabe antes que tú.
+
+
+
+2. Depurar un problema
+El error más común al reportar un bug a Claude es decir "no funciona" y esperar que adivine. Claude necesita lo mismo que necesitaría un compañero de equipo: el error exacto, dónde ocurre y qué estabas haciendo.
+
+Esquema
+Contexto: [Qué estaba haciendo cuando ocurrió]
+ 
+Tarea: Tengo este error:
+[pegar error completo con stack trace]
+Archivo: [archivo y línea si lo sabes]
+ 
+Formato: Antes de corregir nada, necesito que:
+1. Identifica la causa raíz, no el síntoma
+2. Explica por qué ocurre
+3. Propón el fix y justifícalo
+4. ¿Qué más podría verse afectado?
+ 
+Verificación: Añade un test que reproduzca el bug antes del fix
+y que pase después. Ejecuta todos los tests.
+
+
+Ejemplo
+Contexto: Estoy probando el registro de usuarios en Snap.
+ 
+Tarea: Cuando intento registrar un usuario con el email
+"Ana@Email.COM" y después otro con "ana@email.com", el segundo
+registro se crea sin error. Debería fallar porque es el mismo
+email. El error no lanza excepción, simplemente crea un duplicado.
+ 
+Formato: Antes de corregir:
+1. Identifica la causa raíz, no el síntoma
+2. Explica por qué ocurre
+3. Propón el fix y justifícalo
+4. ¿Qué más podría verse afectado?
+ 
+Verificación: Escribe un test que registre el mismo email con
+distintas mayúsculas y verifique que el segundo intento falla.
+Ejecuta los tests.
+
+
+Por qué funciona
+El escenario reproducible vale más que cualquier descripción. El formato de "antes de corregir" obliga a Claude a pensar antes de actuar, lo que produce fixes más precisos. Y pedir que identifique efectos secundarios previene que un arreglo cree dos problemas nuevos.
+
+
+
+3. Refactorizar
+Refactorizar es el patrón donde más fácil es que Claude se desborde. Sin restricciones claras, "refactoriza este módulo" puede convertirse en una reescritura completa que rompe media aplicación. La clave es definir qué no debe cambiar.
+
+Esquema
+Contexto: [Qué módulo y por qué quieres refactorizarlo]
+ 
+Tarea: Refactoriza [archivo/módulo] para [objetivo concreto].
+ 
+Restricciones:
+- La API pública NO debe cambiar
+- Los tests existentes deben seguir pasando sin modificarlos
+- Sigue el patrón [patrón del proyecto]
+ 
+Formato: Antes de tocar código:
+1. Muéstrame qué cambiarías y por qué
+2. Lista los archivos afectados
+3. Identifica riesgos
+ 
+Verificación: Ejecuta todos los tests sin cambiarlos.
+Si alguno falla, el refactoring rompió algo.
+
+
+Ejemplo
+Contexto: En Snap hay lógica de validación dispersa por varios
+servicios: validación de URLs en el servicio de URLs, validación
+de emails en el servicio de auth, validación de alias en otro
+archivo. Quiero centralizarla.
+ 
+Tarea: Extrae toda la validación a un módulo dedicado que los
+demás servicios importen.
+ 
+Restricciones:
+- Los endpoints deben devolver exactamente los mismos errores
+  que antes. Ningún cliente debería notar el cambio.
+- Los tests actuales deben pasar tal cual, sin tocarlos.
+- El módulo de validación debe seguir la misma convención de
+  naming y exports que los módulos existentes.
+ 
+Formato: Antes de implementar, muéstrame:
+1. Muéstrame qué cambiarías y por qué
+2. Lista los archivos afectados
+3. Identifica riesgos
+ 
+Verificación: Ejecuta todos los tests del proyecto. Si pasan
+sin cambios, el refactoring es correcto.
+
+
+Por qué funciona
+La restricción "los tests existentes pasan sin cambiarlos" es la red de seguridad más potente que puedes darle a Claude. Convierte un cambio potencialmente destructivo en algo verificable objetivamente. Y pedir el plan antes de la implementación te da un punto de control donde puedes detener un refactoring mal planteado antes de que toque un solo archivo.
+
+
+
+4. Explorar un proyecto
+Este patrón no produce código. Produce comprensión. Es el primer paso antes de cualquier cambio significativo, y es el que más gente se salta.
+
+Esquema
+Tarea: Analiza [proyecto/módulo/archivo] y responde:
+- [pregunta sobre estructura]
+- [pregunta sobre patrones]
+- [pregunta sobre dependencias]
+- [pregunta sobre convenciones]
+ 
+Formato: [Si quieres un diagrama, una lista, una explicación
+narrativa, etc.]
+ 
+Restricciones: No modifiques nada. Solo lectura.
+
+
+Ejemplo
+Tarea: Analiza el proyecto Snap tal como está y responde:
+1. ¿Qué patrón sigue para separar rutas de lógica de negocio?
+2. ¿Cómo se inicializa y se accede a la base de datos?
+3. ¿Qué convenciones de naming usan los archivos y funciones?
+4. Si quiero añadir un módulo nuevo (ej: "notifications"),
+   ¿qué archivos necesitaría crear para seguir el mismo patrón?
+ 
+Formato: Dame un resumen breve por pregunta y un diagrama ASCII
+de la estructura de carpetas relevante.
+ 
+Restricciones: No crees ni modifiques ningún archivo.
+
+
+Por qué funciona
+Cuando Claude explora antes de implementar, ancla sus decisiones en la realidad del código en lugar de en suposiciones genéricas. El resultado directo: el código que genere después será consistente con lo que ya existe. El resultado indirecto: tú también entiendes mejor tu propio proyecto al leer el análisis.
+
+
+
+5. Escribir tests
+Los tests no son algo que "se añade al final". Pero cuando necesitas generar cobertura para código existente, hay una forma de pedirlo que produce tests útiles en vez de tests superficiales que solo verifican que "la función no lanza error".
+
+Esquema
+Contexto: [Qué módulo/servicio quieres testear y qué hace]
+ 
+Tarea: Genera tests para [archivo]. Para cada función pública:
+- Un test del caso normal (happy path)
+- Un test de caso edge [ejemplos relevantes]
+- Un test de error [ejemplos relevantes]
+ 
+Restricciones:
+- [framework de testing a usar]
+- [patrones de test del proyecto]
+ 
+Verificación: Ejecuta los tests. Después ejecuta con cobertura
+y muéstrame qué porcentaje tiene el archivo.
+
+
+Ejemplo
+Contexto: El servicio de autenticación de Snap tiene funciones
+para register y login. Usa bcrypt para passwords y JWT para tokens.
+ 
+Tarea: Genera tests para src/auth/auth.service.ts. Para cada función:
+- Happy path: registro exitoso devuelve usuario y token,
+  login exitoso devuelve token válido
+- Edge cases: email con mayúsculas mezcladas, password en el
+  límite mínimo de longitud, email con espacios alrededor
+- Errores: email duplicado, password incorrecto, email
+  inexistente, campos vacíos
+ 
+Restricciones:
+- Usa Vitest con describe/it
+- Cada test debe ser independiente (no depender del orden)
+ 
+Verificación: Ejecuta los tests. Después ejecuta vitest --coverage
+y muéstrame la cobertura de auth.service.ts.
+
+
+Por qué funciona
+Especificar las tres categorías (happy path, edge, error) con ejemplos concretos produce tests que realmente encuentran bugs. Sin esos ejemplos, Claude tiende a generar tests genéricos que verifican lo obvio. La verificación con cobertura cierra el ciclo y te dice si quedaron ramas sin cubrir.
+
+
+
+6. Documentar
+El patrón más sencillo en estructura pero el que más se beneficia de especificar el formato. Sin indicar qué quieres, Claude produce documentación genérica que no ayuda a nadie.
+
+Esquema
+Contexto: [Qué va a leer esta documentación y para qué]
+ 
+Tarea: Genera documentación para [archivo/módulo/API] incluyendo:
+- [qué secciones necesitas]
+- [qué nivel de detalle]
+ 
+Formato: [Markdown, JSDoc, README section, etc.]
+[Incluir o no ejemplos de uso]
+ 
+Verificación: Lee el resultado y verifica que cubre todos los
+[endpoints/funciones/módulos] que existen actualmente.
+
+
+Ejemplo
+Contexto: Nuevos desarrolladores van a incorporarse al proyecto
+Snap y necesitan una referencia de la API para empezar a trabajar.
+ 
+Tarea: Genera un archivo docs/API.md con la documentación completa:
+- Descripción breve del proyecto
+- Instrucciones para instalar, ejecutar y testear
+- Cada endpoint: método HTTP, ruta, si requiere autenticación,
+  qué parámetros espera, qué devuelve, y los posibles errores
+- Un ejemplo con curl para cada endpoint
+ 
+Formato: Markdown con secciones por módulo (Auth, URLs, Dashboard).
+ 
+Verificación: Compara el archivo generado con las rutas registradas
+en el código. Si falta algún endpoint, añádelo.
+
+
+Por qué funciona
+Definir quién va a leer la documentación cambia radicalmente el resultado. "Documentación para onboarding de desarrolladores" produce algo distinto a "documentación para el equipo de QA" o "documentación para el cliente". Y la verificación cruzada contra el código real previene la documentación desactualizada desde el minuto cero.
+
+
+
+7. Pedir justificación
+Este no es un patrón de implementación. Es un patrón de revisión. Lo usas después de que Claude haya hecho algo para entender por qué tomó esas decisiones y si hay alternativas mejores.
+
+Esquema
+Tarea: Sobre [la implementación que acabas de hacer]:
+1. ¿Qué alternativas consideraste y por qué elegiste esta?
+2. ¿Qué trade-offs tiene tu decisión?
+3. ¿Qué podría fallar con este enfoque?
+4. ¿Qué harías diferente con más tiempo o a mayor escala?
+
+
+Ejemplo
+Sobre la implementación del tracking de clicks:
+1. ¿Qué alternativas consideraste para registrar los clicks
+   sin bloquear el redirect?
+2. ¿Qué pasa si la escritura en base de datos falla? ¿Se pierde
+   el click silenciosamente?
+3. Si una URL recibe 10.000 clicks por segundo, ¿qué parte
+   del sistema falla primero?
+4. Si tuvieras que escalar esto para millones de URLs,
+   ¿qué cambiarías de la arquitectura?
+
+
+Por qué funciona
+Claude no suele explicar sus decisiones a menos que se lo pidas. Y muchas veces la primera solución que propone es correcta pero no es la mejor. Este patrón convierte a Claude en un revisor de su propio código. Las respuestas te ayudan a decidir si aceptas la implementación tal cual, si pides cambios, o si necesitas un enfoque completamente distinto.
+
+
+
+Combinando patrones: la cadena
+Los patrones no se usan aislados. Una tarea compleja es una secuencia donde cada prompt usa un patrón distinto:
+
+Explorar    → "Analiza cómo funciona el módulo X"
+Implementar → "Siguiendo ese patrón, añade Y"
+Tests       → "Genera tests para lo que acabas de implementar"
+Justificar  → "¿Qué alternativas consideraste?"
+Documentar  → "Actualiza la documentación con los cambios"
+
+
+La regla es que cada prompt de la cadena produce algo que puedes verificar antes de lanzar el siguiente. Si no puedes comprobar el resultado, el paso es demasiado grande o le falta el componente de verificación.
+
+Con el tiempo, estos patrones dejan de ser plantillas que consultas y se convierten en una forma de pensar. No te preguntas "¿qué patrón uso?", sino que naturalmente incluyes contexto, restricciones y verificación en cada instrucción. Eso es lo que separa un uso casual de Claude Code de un uso profesional.

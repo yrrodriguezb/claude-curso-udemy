@@ -1,0 +1,52 @@
+----- Prompt 1 -----
+
+Analiza el estado actual de Snap. ¿Qué datos tenemos
+almacenados? ¿Qué tablas existen y cómo se relacionan?
+¿Qué información podríamos extraer con queries de agregación
+sobre los clicks registrados?
+
+
+----- Prompt 2 -----
+
+Quiero añadir un endpoint de dashboard que dé al usuario
+una vista general de todas sus URLs y su rendimiento.
+Propón 3 niveles de complejidad:
+- Opción básica: solo totales
+- Opción intermedia: totales + tendencias temporales
+- Opción completa: totales + tendencias + rankings
+
+Para cada una dime qué queries necesita y cuánto esfuerzo
+estimado tiene.
+
+
+----- Prompt 3 -----
+
+La opción intermedia me gusta. Muéstrame el plan detallado:
+qué archivos vas a crear o modificar, qué queries SQL usarás,
+y cómo será la estructura de la respuesta del endpoint.
+No implementes nada todavía.
+
+
+----- Prompt 4 -----
+
+¿Qué podría salir mal con ese plan? Si un usuario tiene muchas
+URLs y miles de clicks, ¿las queries escalarían bien?
+¿Necesitamos algún índice adicional en la base de datos?
+
+
+----- Prompt 5 -----
+
+Implementa el dashboard según el plan. Incluye las
+optimizaciones que mencionaste (índices, etc.).
+Escribe tests que cubran:
+- Usuario sin URLs (debe devolver zeros)
+- Usuario con URLs y clicks (debe devolver datos correctos)
+- Que el endpoint requiera autenticación
+Ejecuta todos los tests del proyecto al terminar.
+
+
+----- Prompt 6 -----
+
+Actualiza docs/API.md con el nuevo endpoint de dashboard.
+Después haz commit con Conventional Commits y muéstrame
+un resumen de todos los archivos que cambiaron.
