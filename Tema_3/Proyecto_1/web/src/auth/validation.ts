@@ -1,4 +1,4 @@
-// Mismas reglas que el backend (src/auth/routes.ts), para avisar antes de enviar.
+// Mismas reglas que el backend (src/auth/auth.routes.ts), para avisar antes de enviar.
 export const MIN_PASSWORD_LENGTH = 8;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from "express";
-import { requireAuth } from "../auth/middleware";
+import { requireAuth } from "../auth/auth.middleware";
 import { CODE_RE, UrlError, parseTargetUrl, type UrlService } from "./service";
 
 const STATUS_BY_CODE = { NOT_FOUND: 404, FORBIDDEN: 403, USER_NOT_FOUND: 401 } as const;

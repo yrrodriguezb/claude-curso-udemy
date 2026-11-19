@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from "express";
-import { AuthError, type AuthService } from "./service";
+import { AuthError, type AuthService } from "./auth.service";
 
 export const MIN_PASSWORD_LENGTH = 8;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -45,7 +45,7 @@ export function createAuthRouter(auth: AuthService): Router {
     if (errors.length) return sendError(res, 400, "VALIDATION_ERROR", "Datos inválidos", errors);
 
     try {
-      const result = await auth.register(email!, password!, name!);
+      const result = await auth.register({ email: email!, password: password!, name: name! });
       res.status(201).json(result);
     } catch (err) {
       handleAuthError(err, res);
@@ -63,7 +63,7 @@ export function createAuthRouter(auth: AuthService): Router {
     if (errors.length) return sendError(res, 400, "VALIDATION_ERROR", "Datos inválidos", errors);
 
     try {
-      res.status(200).json(await auth.login(email!, password!));
+      res.status(200).json(await auth.login({ email: email!, password: password! }));
     } catch (err) {
       handleAuthError(err, res);
     }

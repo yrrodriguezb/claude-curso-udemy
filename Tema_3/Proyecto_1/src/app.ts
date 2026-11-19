@@ -1,7 +1,8 @@
 import express, { type NextFunction, type Request, type Response } from "express";
 import type { DB } from "./db";
-import { createAuthService } from "./auth/service";
-import { createAuthRouter } from "./auth/routes";
+import { createAuthRepository } from "./auth/auth.repository";
+import { createAuthService } from "./auth/auth.service";
+import { createAuthRouter } from "./auth/auth.routes";
 import { createUrlService } from "./urls/service";
 import { createRedirectRouter, createUrlsRouter } from "./urls/routes";
 import { createDashboardService } from "./dashboard/service";
@@ -12,7 +13,7 @@ export function createApp(db: DB) {
   app.use(express.json());
 
   const urls = createUrlService(db);
-  app.use("/auth", createAuthRouter(createAuthService(db)));
+  app.use("/auth", createAuthRouter(createAuthService(createAuthRepository(db))));
   app.use("/urls", createUrlsRouter(urls));
   app.use("/dashboard", createDashboardRouter(createDashboardService(db)));
   app.use("/", createRedirectRouter(urls)); // debe ir después de las demás rutas

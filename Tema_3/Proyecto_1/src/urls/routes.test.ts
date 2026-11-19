@@ -4,7 +4,7 @@ import type { AddressInfo } from "node:net";
 import jwt from "jsonwebtoken";
 import { createApp } from "../app";
 import { initDb, type DB } from "../db";
-import { getJwtSecret } from "../auth/service";
+import { getJwtSecret } from "../auth/auth.service";
 import { MAX_CLICK_HEADER_LENGTH } from "./routes";
 
 let db: DB;
@@ -66,7 +66,7 @@ describe("POST /urls (protegido)", () => {
   it("401 sin token", async () => {
     const { status, body } = await request("POST", "/urls", { body: { url: "https://example.com" } });
     expect(status).toBe(401);
-    expect(body.error.code).toBe("UNAUTHORIZED");
+    expect(body).toEqual({ error: "Unauthorized" });
     expect(db.prepare("SELECT COUNT(*) AS n FROM urls").get()).toEqual({ n: 0 });
   });
 

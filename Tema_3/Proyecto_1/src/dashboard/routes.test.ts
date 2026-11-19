@@ -75,7 +75,7 @@ describe("GET /dashboard: autenticación", () => {
   it("401 sin token", async () => {
     const { status, body } = await request("GET", "/dashboard");
     expect(status).toBe(401);
-    expect(body.error.code).toBe("UNAUTHORIZED");
+    expect(body).toEqual({ error: "Unauthorized" });
   });
 
   it("401 con token inválido", async () => {

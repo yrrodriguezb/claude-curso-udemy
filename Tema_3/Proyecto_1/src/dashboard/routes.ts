@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from "express";
-import { requireAuth } from "../auth/middleware";
+import { requireAuth } from "../auth/auth.middleware";
 import {
   DEFAULT_DAYS,
   MAX_DAYS,

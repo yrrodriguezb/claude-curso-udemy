@@ -1,4 +1,4 @@
-// Contrato de la API (ver src/auth/service.ts y src/auth/routes.ts del backend).
+// Contrato de la API (ver src/auth/auth.types.ts y src/auth/auth.routes.ts del backend).
 
 export interface PublicUser {
   id: number;

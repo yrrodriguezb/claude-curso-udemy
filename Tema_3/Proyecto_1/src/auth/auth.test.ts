@@ -4,7 +4,7 @@ import type { AddressInfo } from "node:net";
 import jwt from "jsonwebtoken";
 import { createApp } from "../app";
 import { initDb, type DB } from "../db";
-import { getJwtSecret } from "./service";
+import { getJwtSecret } from "./auth.service";
 
 let db: DB;
 let server: Server;
@@ -31,6 +31,19 @@ async function post(path: string, body: unknown) {
   return { status: res.status, body: (await res.json()) as any };
 }
 
+/** GET a una ruta protegida real (/dashboard) para probar el middleware. */
+async function getProtected(authorization?: string) {
+  const res = await fetch(`${baseUrl}/dashboard`, {
+    headers: authorization ? { Authorization: authorization } : {},
+  });
+  return { status: res.status, headers: res.headers, body: (await res.json()) as any };
+}
+
+const decode = (token: string) => jwt.verify(token, getJwtSecret()) as jwt.JwtPayload;
+
+const sign = (payload: object, options: jwt.SignOptions = {}, secret = getJwtSecret()) =>
+  jwt.sign(payload, secret, { expiresIn: "24h", ...options });
+
 const valid = { email: "ana@example.com", password: "secreto123", name: "Ana" };
 
 describe("POST /auth/register", () => {
@@ -40,7 +53,20 @@ describe("POST /auth/register", () => {
     expect(status).toBe(201);
     expect(body.user).toMatchObject({ email: "ana@example.com", name: "Ana" });
     expect(body.user).not.toHaveProperty("password_hash");
-    expect((jwt.verify(body.token, getJwtSecret()) as jwt.JwtPayload).sub).toBe(String(body.user.id));
+    expect(decode(body.token).sub).toBe(String(body.user.id));
+  });
+
+  it("guarda el password hasheado con bcrypt y firma un JWT de 24h", async () => {
+    const { body } = await post("/auth/register", valid);
+
+    const row = db.prepare("SELECT password_hash FROM users WHERE id = ?").get(body.user.id) as {
+      password_hash: string;
+    };
+    expect(row.password_hash).toMatch(/^\$2[aby]\$10\$/);
+
+    const payload = decode(body.token);
+    expect(payload.email).toBe("ana@example.com");
+    expect(payload.exp! - payload.iat!).toBe(24 * 60 * 60);
   });
 
   it("guarda el email en minúsculas", async () => {
@@ -66,6 +92,12 @@ describe("POST /auth/register", () => {
     const { status, body } = await post("/auth/register", { ...valid, password: "1234567" });
     expect(status).toBe(400);
     expect(body.error.details.map((d: any) => d.field)).toEqual(["password"]);
+  });
+
+  it("400 con name vacío", async () => {
+    const { status, body } = await post("/auth/register", { ...valid, name: "   " });
+    expect(status).toBe(400);
+    expect(body.error.details.map((d: any) => d.field)).toEqual(["name"]);
   });
 
   it("400 listando todos los campos que faltan", async () => {
@@ -95,7 +127,8 @@ describe("POST /auth/login", () => {
     const { status, body } = await post("/auth/login", { email: valid.email, password: valid.password });
     expect(status).toBe(200);
     expect(body.user.email).toBe("ana@example.com");
-    expect(typeof body.token).toBe("string");
+    expect(body.user).not.toHaveProperty("password_hash");
+    expect(decode(body.token).sub).toBe(String(body.user.id));
   });
 
   it("200 con el email en mayúsculas", async () => {
@@ -124,5 +157,71 @@ describe("POST /auth/login", () => {
     const { status, body } = await post("/auth/login", { email: valid.email });
     expect(status).toBe(400);
     expect(body.error.details.map((d: any) => d.field)).toEqual(["password"]);
+  });
+});
+
+describe("middleware requireAuth (ruta protegida)", () => {
+  let token: string;
+  let userId: number;
+
+  beforeEach(async () => {
+    const { body } = await post("/auth/register", valid);
+    token = body.token;
+    userId = body.user.id;
+  });
+
+  it("pasa con un token válido", async () => {
+    const { status } = await getProtected(`Bearer ${token}`);
+    expect(status).toBe(200);
+  });
+
+  it("acepta el esquema 'bearer' en minúsculas", async () => {
+    const { status } = await getProtected(`bearer ${token}`);
+    expect(status).toBe(200);
+  });
+
+  it("401 sin token", async () => {
+    const { status, headers, body } = await getProtected();
+    expect(status).toBe(401);
+    expect(body).toEqual({ error: "Unauthorized" });
+    expect(headers.get("www-authenticate")).toMatch(/^Bearer/);
+  });
+
+  it("401 con un token expirado", async () => {
+    const expired = sign({ sub: String(userId), email: valid.email }, { expiresIn: -60 });
+    const { status, body } = await getProtected(`Bearer ${expired}`);
+    expect(status).toBe(401);
+    expect(body).toEqual({ error: "Unauthorized" });
+  });
+
+  it("401 con un esquema distinto de Bearer", async () => {
+    const { status } = await getProtected(`Basic ${Buffer.from("ana:secreto").toString("base64")}`);
+    expect(status).toBe(401);
+  });
+
+  it("401 con 'Bearer' sin token", async () => {
+    const { status } = await getProtected("Bearer");
+    expect(status).toBe(401);
+  });
+
+  it("401 con un token malformado", async () => {
+    const { status } = await getProtected("Bearer esto.no.es-un-jwt");
+    expect(status).toBe(401);
+  });
+
+  it("401 con un token firmado con otro secreto", async () => {
+    const { status } = await getProtected(`Bearer ${sign({ sub: String(userId), email: valid.email }, {}, "otro")}`);
+    expect(status).toBe(401);
+  });
+
+  it("401 con un token sin firma (alg: none)", async () => {
+    const unsigned = jwt.sign({ sub: String(userId), email: valid.email }, "", { algorithm: "none" } as jwt.SignOptions);
+    const { status } = await getProtected(`Bearer ${unsigned}`);
+    expect(status).toBe(401);
+  });
+
+  it("401 con un token válido pero sin los datos del usuario", async () => {
+    const { status } = await getProtected(`Bearer ${sign({ foo: "bar" })}`);
+    expect(status).toBe(401);
   });
 });
