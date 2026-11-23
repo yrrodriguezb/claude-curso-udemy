@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mi lugar — Kōhi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="/">Kōhi<span>.</span></a>
+    <button id="logout" class="link-button" type="button">CERRAR SESIÓN</button>
+  </header>
+
+  <main>
+    <div class="card dashboard">
+      <div id="message" class="message" role="alert"></div>
+      <p id="loading" class="loading">Cargando tu lugar en la lista…</p>
+
+      <section id="content" hidden>
+        <h1 class="greeting" id="greeting"></h1>
+        <p class="lead" id="email"></p>
+
+        <p class="queue">Eres el <strong id="position">#—</strong> de <span id="total">—</span></p>
+        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Avance en la lista">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <p class="progress-label" id="progress-label"></p>
+
+        <div class="qr" id="qr">QR-—</div>
+        <p class="qr-caption">Presenta este código el día de la apertura.</p>
+      </section>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    const message = document.getElementById('message');
+    const loading = document.getElementById('loading');
+
+    document.getElementById('logout').addEventListener('click', () => {
+      clearToken();
+      location.href = 'login.html';
+    });
+
+    const loadDashboard = async () => {
+      if (!getToken()) return location.replace('login.html');
+
+      const { ok, status, data } = await api('/api/me', { auth: true });
+      loading.hidden = true;
+
+      if (status === 401) {
+        clearToken();
+        return location.replace('login.html');
+      }
+      if (!ok) {
+        return showMessage(message, data.error ?? 'No se pudo cargar tu información.');
+      }
+
+      const { name, email, position, total } = data;
+      // Porcentaje de avance: el #1 está al 100 %, el último al mínimo
+      const progress = Math.round(((total - position + 1) / total) * 100);
+
+      document.getElementById('greeting').textContent = `Hola, ${name}`;
+      document.getElementById('email').textContent = email;
+      document.getElementById('position').textContent = `#${position}`;
+      document.getElementById('total').textContent = total;
+      document.getElementById('progress-label').textContent =
+        position === 1
+          ? 'Estás al frente de la lista.'
+          : `${position - 1} ${position - 1 === 1 ? 'persona' : 'personas'} por delante de ti.`;
+      document.querySelector('.progress').setAttribute('aria-valuenow', progress);
+      document.getElementById('qr').textContent = `QR-${getUserIdFromToken() ?? position}`;
+      document.getElementById('content').hidden = false;
+
+      // Deja que el navegador pinte el 0 % antes de animar la barra
+      requestAnimationFrame(() => {
+        document.getElementById('progress-bar').style.width = `${progress}%`;
+      });
+    };
+
+    loadDashboard();
+  </script>
+</body>
+</html>

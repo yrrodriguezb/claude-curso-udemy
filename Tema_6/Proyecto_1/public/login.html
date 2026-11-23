@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Iniciar sesión — Kōhi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="/">Kōhi<span>.</span></a>
+  </header>
+
+  <main>
+    <div class="card">
+      <h1>Bienvenido de nuevo</h1>
+      <p class="lead">Consulta tu lugar en la lista.</p>
+
+      <div id="message" class="message" role="alert"></div>
+
+      <form id="login-form" novalidate>
+        <div class="field">
+          <label for="email">EMAIL</label>
+          <input id="email" name="email" type="email" autocomplete="email" required>
+        </div>
+        <div class="field">
+          <label for="password">PASSWORD</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">Entrar</button>
+      </form>
+
+      <p class="alt">¿Aún no estás en la lista? <a href="register.html">Únete</a></p>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    if (getToken()) location.replace('dashboard.html');
+
+    const form = document.getElementById('login-form');
+    const message = document.getElementById('message');
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      hideMessage(message);
+
+      const email = form.email.value.trim();
+      const password = form.password.value;
+
+      if (!email || !password) {
+        return showMessage(message, 'Introduce tu email y password.');
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Entrando…';
+
+      const { ok, status, data } = await api('/api/login', {
+        method: 'POST',
+        body: { email, password },
+      });
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Entrar';
+
+      if (!ok) {
+        const text = status === 401
+          ? 'Email o password incorrectos.'
+          : data.error ?? 'No se pudo iniciar sesión.';
+        return showMessage(message, text);
+      }
+
+      setToken(data.token);
+      showMessage(message, 'Sesión iniciada. Redirigiendo…', 'success');
+      location.href = 'dashboard.html';
+    });
+  </script>
+</body>
+</html>
