@@ -8,6 +8,8 @@ src/auth/
 ├── auth.repository.ts  — queries: findByEmail, create
 ├── auth.middleware.ts   — verificación JWT, adjunta req.user
 ├── auth.types.ts       — AuthPayload, RegisterBody, LoginBody
+├── email.validator.ts  — isValidEmail: única fuente de verdad del formato de email
+├── email.validator.test.ts — tests unitarios del validador
 └── auth.test.ts        — tests de integración del módulo
 ```
 

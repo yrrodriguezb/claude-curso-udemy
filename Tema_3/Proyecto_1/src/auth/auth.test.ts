@@ -88,6 +88,16 @@ describe("POST /auth/register", () => {
     expect(body.error.details).toEqual([{ field: "email", message: "El email no es válido" }]);
   });
 
+  it.each(["usuario@.com", "usuario@..com", "usuario@-dominio.com", ".usuario@dominio.com"])(
+    "400 y no registra el usuario con email de formato inválido %s (issue #1)",
+    async (email) => {
+      const { status, body } = await post("/auth/register", { ...valid, email });
+      expect(status).toBe(400);
+      expect(body.error.details).toEqual([{ field: "email", message: "El email no es válido" }]);
+      expect(db.prepare("SELECT COUNT(*) AS n FROM users").get()).toEqual({ n: 0 });
+    }
+  );
+
   it("400 con password muy corto", async () => {
     const { status, body } = await post("/auth/register", { ...valid, password: "1234567" });
     expect(status).toBe(400);
@@ -151,6 +161,12 @@ describe("POST /auth/login", () => {
   it("400 con email inválido", async () => {
     const { status } = await post("/auth/login", { email: "mal", password: valid.password });
     expect(status).toBe(400);
+  });
+
+  it("400 con email de dominio mal formado (issue #1)", async () => {
+    const { status, body } = await post("/auth/login", { email: "ana@example..com", password: valid.password });
+    expect(status).toBe(400);
+    expect(body.error.code).toBe("VALIDATION_ERROR");
   });
 
   it("400 sin password", async () => {
