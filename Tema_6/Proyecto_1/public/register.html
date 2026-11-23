@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Unirme a la lista — Kōhi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="/">Kōhi<span>.</span></a>
+  </header>
+
+  <main>
+    <div class="card">
+      <section id="form-view">
+        <h1>Únete a la lista</h1>
+        <p class="lead">Reserva tu lugar para la primera taza.</p>
+
+        <div id="message" class="message" role="alert"></div>
+
+        <form id="register-form" novalidate>
+          <div class="field">
+            <label for="name">NOMBRE</label>
+            <input id="name" name="name" type="text" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label for="email">EMAIL</label>
+            <input id="email" name="email" type="email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="password">PASSWORD</label>
+            <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required>
+          </div>
+          <div class="field">
+            <label for="confirm">CONFIRMAR PASSWORD</label>
+            <input id="confirm" name="confirm" type="password" autocomplete="new-password" required>
+          </div>
+          <button class="btn btn-primary btn-block" type="submit">Unirme a la lista</button>
+        </form>
+
+        <p class="alt">¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></p>
+      </section>
+
+      <section id="success-view" class="success-panel" hidden>
+        <h1>¡Estás en la lista!</h1>
+        <p class="lead">Tu posición:</p>
+        <p class="position-big" id="position">#—</p>
+        <a class="btn btn-primary btn-block" href="login.html">Ver mi panel</a>
+      </section>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    const form = document.getElementById('register-form');
+    const message = document.getElementById('message');
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      hideMessage(message);
+
+      const name = form.name.value.trim();
+      const email = form.email.value.trim();
+      const password = form.password.value;
+      const confirm = form.confirm.value;
+
+      if (!name || !email || !password || !confirm) {
+        return showMessage(message, 'Completa todos los campos.');
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return showMessage(message, 'Introduce un email válido.');
+      }
+      if (password.length < 8) {
+        return showMessage(message, 'El password debe tener al menos 8 caracteres.');
+      }
+      if (password !== confirm) {
+        return showMessage(message, 'Los passwords no coinciden.');
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Registrando…';
+
+      const { ok, status, data } = await api('/api/register', {
+        method: 'POST',
+        body: { name, email, password },
+      });
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Unirme a la lista';
+
+      if (!ok) {
+        const text = status === 409
+          ? 'Ese email ya está en la lista. ¿Quieres iniciar sesión?'
+          : data.error ?? 'No se pudo completar el registro.';
+        return showMessage(message, text);
+      }
+
+      document.getElementById('position').textContent = `#${data.position}`;
+      document.getElementById('form-view').hidden = true;
+      document.getElementById('success-view').hidden = false;
+    });
+  </script>
+</body>
+</html>

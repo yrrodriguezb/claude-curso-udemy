@@ -1,0 +1,35 @@
+----- Prompt 1 -----
+
+Vamos a ejecutar un flujo completo de desarrollo usando GitHub MCP:
+
+FASE 1 - DESCUBRIMIENTO:
+1. Lista los 10 issues abiertos más recientes del repositorio
+2. Busca si hay issues con label "bug" sin asignar
+
+
+----- Prompt 2 -----
+
+FASE 2 - TRIAJE:
+3. Crea un nuevo issue titulado "Bug: la validación de email acepta
+   formatos inválidos como usuario@.com" con:
+   - Label: "bug", "priority:high"
+   - Descripción detallada con pasos para reproducir
+   - Criterios de aceptación
+
+
+----- Prompt 3 -----
+
+FASE 3 - IMPLEMENTACIÓN:
+4. Crea una nueva branch "fix/email-validation"
+5. Busca en el código dónde se implementa la validación de email
+   usando search_code
+6. Propón y aplica el fix
+
+
+----- Prompt 4 -----
+
+FASE 4 - ENTREGA:
+7. Crea un Pull Request de la branch actual a main con:
+   - Descripción auto-generada basada en los cambios
+   - Referencia al issue creado (Fixes #XX)
+   - Checklist de review

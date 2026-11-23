@@ -1,0 +1,188 @@
+----- Prompt 1 -----
+
+Contexto: Tenemos un repo de test en GitHub donde ya hemos
+hecho pruebas con el MCP de GitHub. Ahora vamos a construir
+un proyecto que demuestre el uso combinado de 3 MCPs:
+GitHub, SQLite y Playwright.
+
+Tarea: Usa el MCP de GitHub para explorar el repo
+[OWNER/REPO-NAME]: estructura de archivos, branches y
+último commit. Necesito saber el estado actual antes de
+añadir nada.
+
+No hagas cambios, solo explora.
+
+
+----- Prompt 2 -----
+
+Contexto: Vamos a construir "Kōhi", la web de una cafetería
+de especialidad que está a punto de abrir. Los usuarios se
+registran para unirse a la lista de espera de la inauguración
+y acceden a un panel donde ven su posición en la cola y un
+código QR ficticio de invitación.
+
+El objetivo didáctico es demostrar 3 MCPs juntos:
+- SQLite: almacenar usuarios y su posición en la waitlist
+- GitHub: gestionar el código en el repo existente
+- Playwright: tests E2E del flujo completo
+
+Stack: Node.js + Express, better-sqlite3, bcrypt, JWT,
+HTML/CSS vanilla (sin frameworks), Playwright para tests.
+
+Tarea: Propón el plan completo:
+- Estructura de archivos y carpetas
+- Endpoints necesarios
+- Páginas HTML: landing de la cafetería, registro a la
+  waitlist, login, panel privado con posición en cola
+- Tests E2E a cubrir con Playwright
+
+No implementes nada todavía.
+
+
+----- Prompt 3 -----
+
+Contexto: Kōhi es una web de cafetería con waitlist.
+Acabamos de cerrar el plan del proyecto.
+
+Tarea: Usa el MCP de SQLite para crear la base de datos
+kohi.db con una tabla "waitlist" que tenga:
+id (integer primary key autoincrement),
+name (text not null),
+email (text unique not null),
+password_hash (text not null),
+position (integer),
+created_at (datetime default current_timestamp).
+
+Después inserta un usuario de prueba: name "Café Lover",
+email "test@kohi.com", password_hash "placeholder",
+position 1. Haz un SELECT para confirmar.
+
+Restricciones: Usa exclusivamente el MCP de SQLite,
+no escribas scripts.
+
+Verificación: Muéstrame el resultado del SELECT.
+
+
+----- Prompt 4 -----
+
+Contexto: Kōhi usa Express + better-sqlite3. Ya existe
+kohi.db con la tabla waitlist. Cada registro nuevo recibe
+automáticamente la siguiente posición en la cola.
+
+Tarea: Implementa el backend:
+1. POST /api/register — recibe name, email y password.
+   Hashea el password con bcrypt, calcula la posición
+   (MAX(position)+1), guarda en SQLite, devuelve éxito
+   con la posición asignada.
+2. POST /api/login — verifica credenciales, devuelve JWT.
+3. GET /api/me — protegido con middleware JWT. Devuelve
+   name, email, position y total de personas en la waitlist.
+4. Sirve estáticos desde public/.
+
+Restricciones:
+- No ORMs, solo better-sqlite3 directo
+- Errores claros: email duplicado → 409, credenciales
+  inválidas → 401, campos faltantes → 400
+- Puerto 3000
+
+Verificación: Arranca el servidor y haz curl a /api/register
+con un usuario nuevo. Muéstrame la respuesta con la posición.
+
+
+----- Prompt 5 -----
+
+Contexto: Kōhi tiene el backend en puerto 3000 con
+/api/register, /api/login y /api/me. Sirve estáticos
+desde public/. Es la web de una cafetería de especialidad
+japonesa moderna.
+
+Tarea: Crea las páginas en public/:
+1. index.html — Landing de la cafetería: nombre "Kōhi"
+   grande, un subtítulo tipo "Café de especialidad.
+   Próxima apertura.", una frase breve sobre la filosofía
+   del café, y dos botones: "Unirme a la lista" y
+   "Ya tengo cuenta"
+2. register.html — Formulario de registro a la waitlist
+   (nombre, email, password, confirmar password). Al
+   registrarse muestra "¡Estás en la lista! Tu posición:
+   #N"
+3. login.html — Formulario de login
+4. dashboard.html — Panel privado que muestra: saludo
+   con el nombre, posición en la cola ("Eres el #N de M"),
+   una barra de progreso visual, y un div con un código
+   QR ficticio (puede ser un cuadrado con texto "QR-[ID]")
+
+Restricciones:
+- HTML y CSS vanilla, sin frameworks
+- Paleta oscura elegante: fondo casi negro, textos claros,
+  acento en color dorado/ámbar
+- Tipografía con aire japonés minimalista
+- fetch() para las llamadas, mensajes de error/éxito claros
+
+Verificación: Arranca el servidor y confirma que
+http://localhost:3000 muestra la landing correctamente.
+
+
+----- Prompt 6 -----
+
+Contexto: Kōhi está corriendo en localhost:3000. Tiene
+landing, registro, login y dashboard funcionales.
+Tenemos el MCP de Playwright disponible.
+
+Tarea: Usa el MCP de Playwright para testear el flujo
+completo:
+
+1. Navega a http://localhost:3000 — verifica que aparece
+   "Kōhi" y los botones de registro y login
+2. Click en "Unirme a la lista" → rellena el formulario
+   con nombre "Ana Barista", email "ana@test.com" y
+   password "Test1234" → envía y verifica que aparece
+   el mensaje con la posición asignada
+3. Ve a login → introduce email y password de Ana →
+   verifica que redirige al dashboard
+4. En el dashboard verifica que aparece "Ana Barista",
+   su posición en la cola, y el código QR ficticio
+5. Toma captura de pantalla del dashboard como evidencia
+
+Restricciones: Usa exclusivamente las herramientas del
+MCP de Playwright (navigate, click, fill, screenshot...),
+no escribas archivos de test con código.
+
+Verificación: Muéstrame el resultado de cada paso y la
+captura final.
+
+
+----- Prompt 7 -----
+
+Contexto: Kōhi está completa y testeada. Todo el código
+está en local. El repo es [OWNER/REPO-NAME].
+
+Tarea: Usa el MCP de GitHub para:
+1. Crear branch "feat/kohi-waitlist"
+2. Subir todos los archivos del proyecto a esa branch
+3. Crear un Pull Request con título "feat: add Kōhi
+   waitlist app" y descripción que explique:
+   - Qué hace la app (landing de cafetería con waitlist)
+   - Qué MCPs se usaron (SQLite, GitHub, Playwright)
+   - Qué demuestra el proyecto
+
+Restricciones: Usa exclusivamente el MCP de GitHub,
+no uses git local.
+
+Verificación: Muéstrame la URL del Pull Request.
+
+
+----- Prompt 8 -----
+
+Contexto: Durante el test con Playwright registramos a
+"Ana Barista" a través del formulario web.
+
+Tarea: Usa el MCP de SQLite para cerrar el ciclo:
+1. SELECT * FROM waitlist — muéstrame todos los usuarios
+2. Confirma que "ana@test.com" existe con su posición
+3. Muéstrame el schema de la tabla
+
+Esto demuestra el ciclo completo: Playwright interactuó
+con el frontend → Express procesó la request → SQLite
+almacenó el dato → y ahora lo verificamos directamente
+en la DB con el MCP.

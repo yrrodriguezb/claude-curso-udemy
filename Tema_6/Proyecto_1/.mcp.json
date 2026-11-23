@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ],
+      "env": {}
+    },
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${GITHUB_TOKEN}"
+      }
+    },
+    "sqlite": {
+      "type": "stdio",
+      "command": "C:/Users/yeison.rodriguez/Documents/Repos/YRR/Cursos/IA/Claude/Tema_6/Proyecto_1/.venv/Scripts/mcp-server-sqlite.exe",
+      "args": [
+        "--db-path",
+        "C:/Users/yeison.rodriguez/Documents/Repos/YRR/Cursos/IA/Claude/Tema_6/Proyecto_1/kohi.db"
+      ],
+      "env": {}
+    }
+  }
+}
