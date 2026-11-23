@@ -1,0 +1,6 @@
+node_modules/
+.venv/
+*.db-wal
+*.db-shm
+.env
+.playwright-mcp/
