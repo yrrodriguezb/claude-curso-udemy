@@ -1,8 +1,8 @@
 import { Router, type Request, type Response } from "express";
 import { AuthError, type AuthService } from "./auth.service";
+import { isValidEmail } from "./email.validator";
 
 export const MIN_PASSWORD_LENGTH = 8;
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type ValidationError = { field: string; message: string };
 
@@ -16,7 +16,7 @@ function asString(value: unknown): string | undefined {
 
 function validateEmail(email: string | undefined, errors: ValidationError[]) {
   if (!email?.trim()) errors.push({ field: "email", message: "El email es obligatorio" });
-  else if (!EMAIL_RE.test(email.trim())) errors.push({ field: "email", message: "El email no es válido" });
+  else if (!isValidEmail(email.trim())) errors.push({ field: "email", message: "El email no es válido" });
 }
 
 function handleAuthError(err: unknown, res: Response) {
