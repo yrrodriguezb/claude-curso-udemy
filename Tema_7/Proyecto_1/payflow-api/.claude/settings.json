@@ -1,0 +1,61 @@
+{
+	"hooks": {
+		"PreToolUse": [
+			{
+				"matcher": "Bash",
+				"hooks": [
+					{
+						"type": "command",
+						"command": "$input = $Input | ConvertFrom-Json; $entry = @{ts=(Get-Date -Format o); session=$input.session_id; cmd=$input.tool_input.command} | ConvertTo-Json -Compress; $logDir = Join-Path $env:CLAUDE_PROJECT_DIR '.claude/logs'; New-Item -ItemType Directory -Force -Path $logDir | Out-Null; Add-Content -Path (Join-Path $logDir 'audit.jsonl') -Value $entry",
+						"shell": "powershell",
+						"async": true
+					}
+				]
+			},
+			{
+				"matcher": "Bash|PowerShell|Write|Edit|MultiEdit",
+				"hooks": [
+					{
+						"type": "command",
+						"command": "env -u VIRTUAL_ENV py -3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/security_gate.py || { echo 'security_gate.py falló; bloqueando por seguridad' >&2; exit 2; }"
+					}
+				]
+			}
+		],
+		"PostToolUse": [
+			{
+				"matcher": "Edit|Write|MultiEdit",
+				"hooks": [
+					{
+						"type": "prompt",
+						"prompt": "Eres un revisor de código para un proyecto FastAPI en Python. Analiza la siguiente acción de edición de código: $ARGUMENTS. Verifica estas convenciones: 1) Todas las funciones tienen type hints en parámetros y retorno. 2) Las funciones públicas tienen docstring. 3) Las queries SQL usan parámetros (?) en vez de f-strings. 4) Los endpoints FastAPI usan modelos Pydantic para request y response. 5) No hay secrets hardcodeados (API keys, passwords, tokens literales). Si alguna convención se viola, responde que SÍ hay problema y explica cuál. Si todo está correcto, responde que NO hay problema.",
+						"timeout": 45
+					}
+				]
+			}
+		],
+		"Stop": [
+			{
+				"hooks": [
+					{
+						"type": "agent",
+						"prompt": "Eres un verificador de calidad para el proyecto PayFlow (FastAPI + Python). Tu trabajo es inspeccionar el estado del proyecto antes de que el desarrollador dé por terminada la tarea actual. Haz lo siguiente: 1) Usa Glob para encontrar todos los archivos .py en app/ y tests/. 2) Usa Grep para buscar funciones sin type hints (def.*:$ sin -> en la misma línea). 3) Usa Grep para buscar queries SQL con f-strings (f\".*SELECT|f\".*INSERT|f\".*UPDATE|f\".*DELETE). 4) Usa Grep para buscar TODO o FIXME pendientes en app/. 5) Verifica que existan archivos de test para cada router (test_payments.py, test_merchants.py, test_health.py). Si encuentras problemas en los puntos 2, 3 o 5, responde con decision block explicando qué hay que corregir. Los TODOs del punto 4 repórtalos como advertencia pero no bloquees. Si todo está correcto, permite que Claude termine.",
+						"timeout": 120
+					},
+					{
+						"type": "http",
+						"url": "http://localhost:5001/hooks/task-completed",
+						"timeout": 20,
+						"headers": {
+							"Authorization": "Bearer $PAYFLOW_WEBHOOK_SECRET",
+							"Content-Type": "application/json"
+						},
+						"allowedEnvVars": [
+							"PAYFLOW_WEBHOOK_SECRET"
+						]
+					}
+				]
+			}
+		]
+	}
+}
