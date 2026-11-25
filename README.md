@@ -17,7 +17,8 @@ Las secciones prácticas tienen su propia carpeta (`Tema_N/`) con los prompts qu
 | 6 | [Modos de operación, permisos y seguridad](#6-modos-de-operación-permisos-y-seguridad) | [`Tema_5/`](Tema_5/) · [`Lecturas/Seccion 6/`](Lecturas/Seccion%206/) | ✅ Completado |
 | 7 | [Servidores MCP: GitHub, SQLite y Playwright](#7-servidores-mcp-github-sqlite-y-playwright) | [`Tema_6/`](Tema_6/) | ✅ Completado |
 | 8 | [Hooks y automatización basada en eventos](#8-hooks-y-automatización-basada-en-eventos) | [`Tema_7/`](Tema_7/) · [`Lecturas/Seccion 8/`](Lecturas/Seccion%208/) | ✅ Completado |
-| 9 | [Subagentes](#9-subagentes) | [`Tema_8/`](Tema_8/) · [`Lecturas/Seccion 9/`](Lecturas/Seccion%209/) | 🚧 En curso |
+| 9 | [Subagentes](#9-subagentes) | [`Tema_8/`](Tema_8/) · [`Lecturas/Seccion 9/`](Lecturas/Seccion%209/) | ✅ Completado |
+| 10 | [Skills y plugins](#10-skills-y-plugins) | [`Tema_9/`](Tema_9/) · [`Lecturas/Seccion 10/`](Lecturas/Seccion%2010/) | 🚧 En curso |
 
 ---
 
@@ -42,6 +43,9 @@ Material teórico de cada sección, ubicado en [`Lecturas/`](Lecturas/).
 | 8 | [Matchers y Variables de entorno en Hooks](Lecturas/Seccion%208/Matchers%20y%20Variables%20de%20entorno%20en%20Hooks%20de%20Claude%20Code.md) | Qué filtra el `matcher` en cada evento, variables `$CLAUDE_*` y el JSON que llega por stdin. |
 | 8 | ⚡ [Hooks y automatizaciones basadas en eventos — De cero a experto](Lecturas/Seccion%208/Hooks%20y%20automatizaciones%20basadas%20en%20eventos%20-%20De%20cero%20a%20experto.md) | Guía integral: contrato de entrada/salida, recetario, patrones avanzados, hooks en Node.js testeables, depuración, seguridad y proyecto integrador. |
 | 9 | 🤖 [Subagentes en Claude Code — De cero a experto](Lecturas/Seccion%209/Subagentes%20en%20Claude%20Code%20-%20De%20cero%20a%20experto.md) | Guía integral de subagentes: modelo orquestador/trabajadores, alcance y precedencia, **frontmatter campo por campo** (`tools`, `model`, `permissionMode`, `memory`, `isolation`…), recetario (revisor, tests, migraciones EF Core, seguridad, E2E), patrones de orquestación, costos, seguridad y proyecto integrador. |
+| 10 | 🧩 [Skills vs Subagentes vs Memoria vs Hooks](Lecturas/Seccion%2010/Skills%20vs%20Subagentes%20vs%20Memoria%20vs%20Hooks.md) | Diferencias entre las cuatro piezas: la memoria dice **qué es verdad**, la skill **cómo se hace**, el subagente **quién lo hace** y el hook **qué ocurre siempre**. |
+| 10 | 🧩 [Campos de configuración de una Skill — De cero a avanzado](Lecturas/Seccion%2010/Campos%20de%20configuracion%20de%20una%20Skill%20-%20De%20cero%20a%20avanzado.md) | Frontmatter campo por campo (`description`, `disable-model-invocation`, `argument-hint`, `allowed-tools`, `model`, `paths`, `context: fork`…), archivos de soporte, hooks locales y recetario. |
+| 10 | 📦 [Plugins en Claude Code — De cero a experto](Lecturas/Seccion%2010/Plugins%20en%20Claude%20Code%20-%20De%20cero%20a%20experto.md) | Estructura de un plugin (`.claude-plugin/plugin.json`, `skills/`, `agents/`, `hooks/`, `bin/`, `.mcp.json`, `.lsp.json`), namespacing, pruebas locales, marketplaces, plugins de equipo, versionado y seguridad. |
 
 ---
 
@@ -321,11 +325,45 @@ npm test
 
 ---
 
+## 10. Skills y plugins
+
+Empaquetar conocimiento reutilizable en **skills** que Claude carga cuando las necesita (o que se invocan con `/`), y agrupar skills, subagentes, hooks y servidores MCP en **plugins** distribuibles. Se practica sobre **Artemis II Mission Tracker**, un simulador 3D de la misión Artemis II.
+
+### Temas abordados
+
+- **Skills vs subagentes vs memoria vs hooks**: cuándo usar cada pieza.
+- **Skills de proyecto** en `.claude/skills/<nombre>/SKILL.md`: frontmatter y cuerpo con instrucciones.
+- **Invocación manual** con `disable-model-invocation: true` y `argument-hint` (`/add-event`, `/capture-view`).
+- **Permisos acotados** con `allowed-tools` (por ejemplo `Bash(npm test *)`).
+- **Activación condicional por ruta** con `paths`: `scene-conventions` solo se carga al editar la escena 3D.
+- **Plugins**: manifiesto en `.claude-plugin/plugin.json`, namespacing, marketplaces y `enabledPlugins` en `.claude/settings.json` (el proyecto habilita `code-review@anthropic-plugin-directory`).
+
+### Contenido
+
+| Archivo / carpeta | Descripción |
+|---|---|
+| [`prompt_simulador_Artemis.txt`](Tema_9/Proyecto_1/prompt_simulador_Artemis.txt) | Prompt completo del simulador: stack, escena 3D, HUD, timeline, panel de eventos, cámaras, tripulación y datos reales de la misión. |
+| [`Proyecto_1/simulador_artemis/`](Tema_9/Proyecto_1/simulador_artemis/) | **Artemis II Mission Tracker**: API en Express + TypeScript (trayectoria, eventos, telemetría y tripulación), escena 3D con Three.js, gráficos con Chart.js y tests con Vitest. |
+| [`.claude/skills/`](Tema_9/Proyecto_1/simulador_artemis/.claude/skills/) | Skills `add-event` (añadir eventos a la timeline), `capture-view` (generar una vista de cámara en un momento de la misión) y `scene-conventions` (convenciones de la escena Three.js). |
+| [`.claude/settings.json`](Tema_9/Proyecto_1/simulador_artemis/.claude/settings.json) | Habilita el plugin `code-review` para el proyecto. |
+| [`Lecturas/Seccion 10/`](Lecturas/Seccion%2010/) | Lecturas de skills, plugins y la comparación entre piezas (ver [📘 Lecturas](#-lecturas)). |
+
+#### Ejecutar Artemis II Mission Tracker
+
+```bash
+cd Tema_9/Proyecto_1/simulador_artemis
+npm install
+npm run dev          # http://localhost:3000
+npm test
+```
+
+---
+
 ## 🛠️ Requisitos generales
 
 - [Claude Code](https://docs.claude.com/en/docs/claude-code/overview)
 - Python 3.12 o superior (`Tema_1`, `Tema_5`, `Tema_7`)
-- Node.js 22 o superior (`Tema_2`, `Tema_3`, `Tema_6`, `Tema_8`)
+- Node.js 22 o superior (`Tema_2`, `Tema_3`, `Tema_6`, `Tema_8`, `Tema_9`)
 - Git
 - Para la sección 7: token de GitHub para el MCP de GitHub y `mcp-server-sqlite` (Python) para el MCP de SQLite
 
@@ -366,7 +404,8 @@ Claude/
 │   ├── Seccion 5/                   # Memoria: auto memory, reglas modulares, glob
 │   ├── Seccion 6/                   # Permisos, hooks, sandboxing y MCP (+ checklist de seguridad)
 │   ├── Seccion 8/                   # Hooks: eventos, matchers y guía de cero a experto
-│   └── Seccion 9/                   # Subagentes: de cero a experto
+│   ├── Seccion 9/                   # Subagentes: de cero a experto
+│   └── Seccion 10/                  # Skills, plugins y comparación entre piezas
 ├── Tema_1/                          # Sección 2 · Introducción a Claude
 │   ├── proyecto_1_prompt.txt
 │   ├── proyecto_final_prompts.txt
@@ -398,11 +437,17 @@ Claude/
 │   └── Proyecto_1/payflow-api/      # PayFlow (FastAPI + aiosqlite)
 │       ├── .claude/settings.json    # Hooks command, prompt, agent y http
 │       └── .claude/hooks/security_gate.py
-└── Tema_8/                          # Sección 9 · Subagentes
+├── Tema_8/                          # Sección 9 · Subagentes
+│   └── Proyecto_1/
+│       ├── prompt_exploracion_subagentes.txt
+│       ├── prompt_subagente_security_reviewer.txt
+│       └── healthtrack-api/         # HealthTrack (Express + TypeScript + SQLite)
+│           ├── .claude/agents/      # security-reviewer, test-engineer, api-documenter, db-analyst
+│           └── .claude/agent-memory/
+└── Tema_9/                          # Sección 10 · Skills y plugins
     └── Proyecto_1/
-        ├── prompt_exploracion_subagentes.txt
-        ├── prompt_subagente_security_reviewer.txt
-        └── healthtrack-api/         # HealthTrack (Express + TypeScript + SQLite)
-            ├── .claude/agents/      # security-reviewer, test-engineer, api-documenter, db-analyst
-            └── .claude/agent-memory/
+        ├── prompt_simulador_Artemis.txt
+        └── simulador_artemis/       # Artemis II Mission Tracker (Express + TypeScript + Three.js)
+            ├── .claude/skills/      # add-event, capture-view, scene-conventions
+            └── .claude/settings.json # enabledPlugins: code-review
 ```
