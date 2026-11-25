@@ -15,7 +15,9 @@ Las secciones prácticas tienen su propia carpeta (`Tema_N/`) con los prompts qu
 | 4 | [Prompting profesional para Claude Code](#4-prompting-profesional-para-claude-code) | [`Tema_3/`](Tema_3/) | ✅ Completado |
 | 5 | [Memoria persistente con Claude Code](#5-memoria-persistente-con-claude-code) | [`Tema_3/`](Tema_3/) · [`Lecturas/Seccion 5/`](Lecturas/Seccion%205/) | ✅ Completado |
 | 6 | [Modos de operación, permisos y seguridad](#6-modos-de-operación-permisos-y-seguridad) | [`Tema_5/`](Tema_5/) · [`Lecturas/Seccion 6/`](Lecturas/Seccion%206/) | ✅ Completado |
-| 7 | [Servidores MCP: GitHub, SQLite y Playwright](#7-servidores-mcp-github-sqlite-y-playwright) | [`Tema_6/`](Tema_6/) | 🚧 En curso |
+| 7 | [Servidores MCP: GitHub, SQLite y Playwright](#7-servidores-mcp-github-sqlite-y-playwright) | [`Tema_6/`](Tema_6/) | ✅ Completado |
+| 8 | [Hooks y automatización basada en eventos](#8-hooks-y-automatización-basada-en-eventos) | [`Tema_7/`](Tema_7/) · [`Lecturas/Seccion 8/`](Lecturas/Seccion%208/) | ✅ Completado |
+| 9 | [Subagentes](#9-subagentes) | [`Tema_8/`](Tema_8/) · [`Lecturas/Seccion 9/`](Lecturas/Seccion%209/) | 🚧 En curso |
 
 ---
 
@@ -36,6 +38,10 @@ Material teórico de cada sección, ubicado en [`Lecturas/`](Lecturas/).
 | 6 | [Sandboxing](Lecturas/Seccion%206/Sandboxing%20con%20Claude%20Code.md) | Aislamiento a nivel de sistema operativo de archivos y red. |
 | 6 | [Instalación, scopes y gestión de servidores MCP](Lecturas/Seccion%206/Instalaci%C3%B3n%2C%20scopes%20y%20gesti%C3%B3n%20de%20servidores%20MCP%20en%20Claude%20Code.md) | `claude mcp add`, scopes `local` / `project` / `user`, `.mcp.json`, `/mcp` y permisos sobre tools MCP. |
 | 6 | ⚠️ [IMPORTANTE — Seguridad en servidores MCP](Lecturas/Seccion%206/IMPORTANTE%20-%20Seguridad%20en%20servidores%20MCP.md) | Amenazas de MCP de básico a avanzado (prompt injection, tool poisoning, tríada letal, OAuth…) y **checklist de seguridad** para auditar cada servidor. |
+| 8 | [Eventos y Hooks disponibles](Lecturas/Seccion%208/Eventos%20y%20Hooks%20disponibles%20en%20Claude%20Code.md) | Catálogo de eventos del ciclo de vida, tipos de handler (`command`, `http`, `prompt`, `agent`) y exit codes. |
+| 8 | [Matchers y Variables de entorno en Hooks](Lecturas/Seccion%208/Matchers%20y%20Variables%20de%20entorno%20en%20Hooks%20de%20Claude%20Code.md) | Qué filtra el `matcher` en cada evento, variables `$CLAUDE_*` y el JSON que llega por stdin. |
+| 8 | ⚡ [Hooks y automatizaciones basadas en eventos — De cero a experto](Lecturas/Seccion%208/Hooks%20y%20automatizaciones%20basadas%20en%20eventos%20-%20De%20cero%20a%20experto.md) | Guía integral: contrato de entrada/salida, recetario, patrones avanzados, hooks en Node.js testeables, depuración, seguridad y proyecto integrador. |
+| 9 | 🤖 [Subagentes en Claude Code — De cero a experto](Lecturas/Seccion%209/Subagentes%20en%20Claude%20Code%20-%20De%20cero%20a%20experto.md) | Guía integral de subagentes: modelo orquestador/trabajadores, alcance y precedencia, **frontmatter campo por campo** (`tools`, `model`, `permissionMode`, `memory`, `isolation`…), recetario (revisor, tests, migraciones EF Core, seguridad, E2E), patrones de orquestación, costos, seguridad y proyecto integrador. |
 
 ---
 
@@ -244,11 +250,82 @@ npm start            # http://localhost:3000  (define JWT_SECRET fuera de desarr
 
 ---
 
+## 8. Hooks y automatización basada en eventos
+
+Automatizar reglas que deben cumplirse **siempre** mediante hooks del ciclo de vida de Claude Code. Se practica sobre **PayFlow**, una API de pagos en FastAPI protegida y auditada con hooks de los cuatro tipos.
+
+### Temas abordados
+
+- **Eventos del ciclo de vida**: `PreToolUse`, `PostToolUse` y `Stop`, y qué filtra el `matcher` en cada uno.
+- **Hooks `command`**: auditoría asíncrona (`async: true`) de cada comando en `.claude/logs/audit.jsonl` y un *security gate* en Python que bloquea comandos peligrosos y acceso a archivos sensibles (fail-closed).
+- **Hooks `prompt`**: un LLM revisa cada edición (type hints, docstrings, SQL parametrizado, secretos hardcodeados).
+- **Hooks `agent`**: verificador de calidad en `Stop` que inspecciona el proyecto con Glob/Grep antes de dejar terminar.
+- **Hooks `http`**: notificar a un webhook al completar la tarea, con `allowedEnvVars` para el secreto.
+- **Compatibilidad multiplataforma**: hooks para Bash y PowerShell en Windows.
+
+### Contenido
+
+| Archivo / carpeta | Descripción |
+|---|---|
+| [`prompt_proyecto_tema.txt`](Tema_7/prompt_proyecto_tema.txt) | Prompt completo para construir PayFlow (estructura, endpoints, frontend, tests y restricciones). |
+| [`Proyecto_1/payflow-api/`](Tema_7/Proyecto_1/payflow-api/) | **PayFlow**: API REST de pagos en FastAPI + aiosqlite + Pydantic v2 (merchants, pagos con `X-API-Key`, transiciones de estado) con dashboard HTML vanilla en `/dashboard` y tests con pytest + httpx. |
+| [`.claude/settings.json`](Tema_7/Proyecto_1/payflow-api/.claude/settings.json) | Registro de los hooks `command`, `prompt`, `agent` y `http`. |
+| [`.claude/hooks/security_gate.py`](Tema_7/Proyecto_1/payflow-api/.claude/hooks/security_gate.py) | Hook `PreToolUse` que bloquea borrados destructivos, git destructivo, elevación de privilegios y archivos sensibles. |
+| [`webhook_server.py`](Tema_7/Proyecto_1/payflow-api/webhook_server.py) | Servidor local que recibe el hook `http` de `Stop`. |
+| [`Lecturas/Seccion 8/`](Lecturas/Seccion%208/) | Lecturas de eventos, matchers y la guía de cero a experto (ver [📘 Lecturas](#-lecturas)). |
+
+#### Ejecutar PayFlow
+
+```bash
+cd Tema_7/Proyecto_1/payflow-api
+python -m venv .venv
+.venv\Scripts\activate          # Windows  ·  source .venv/bin/activate en Linux/macOS
+pip install -e ".[dev]"
+python -m pytest tests/ -v
+python -m uvicorn app.main:app --reload   # http://localhost:8000/dashboard
+```
+
+---
+
+## 9. Subagentes
+
+Delegar trabajo en agentes especializados con su propio contexto, herramientas y modelo. Se practica sobre **HealthTrack**, una API de seguimiento de salud con roles admin/doctor/paciente.
+
+### Temas abordados
+
+- **Exploración en paralelo**: tres subagentes investigan a la vez autenticación, modelo de datos y estado de los tests, y el hilo principal consolida los resultados.
+- **Subagentes de proyecto** en `.claude/agents/`: frontmatter (`name`, `description`, `tools`, `model`, `memory`, `color`) y system prompt.
+- **Mínimo privilegio**: agentes de solo lectura frente a agentes con escritura, y modelo `haiku` o `sonnet` según la tarea.
+- **Memoria persistente** (`memory: project`): el `security-reviewer` guarda hallazgos, falsos positivos y patrones del repo en `.claude/agent-memory/`.
+
+### Contenido
+
+| Archivo / carpeta | Descripción |
+|---|---|
+| [`prompt_exploracion_subagentes.txt`](Tema_8/Proyecto_1/prompt_exploracion_subagentes.txt) | Prompt para lanzar tres investigaciones en paralelo con subagentes. |
+| [`prompt_subagente_security_reviewer.txt`](Tema_8/Proyecto_1/prompt_subagente_security_reviewer.txt) | Prompt para crear el agente `security-reviewer` (JWT/RBAC, PII, SQL injection, OWASP). |
+| [`Proyecto_1/healthtrack-api/`](Tema_8/Proyecto_1/healthtrack-api/) | **HealthTrack**: API en Express + TypeScript + better-sqlite3 con JWT + bcrypt (pacientes, citas, métricas de salud y notificaciones), dashboard con Tailwind + Chart.js y tests con Vitest. |
+| [`.claude/agents/`](Tema_8/Proyecto_1/healthtrack-api/.claude/agents/) | Subagentes `security-reviewer`, `test-engineer`, `api-documenter` y `db-analyst`. |
+| [`.claude/agent-memory/security-reviewer/`](Tema_8/Proyecto_1/healthtrack-api/.claude/agent-memory/security-reviewer/) | Memoria persistente del revisor de seguridad. |
+| [`Lecturas/Seccion 9/`](Lecturas/Seccion%209/) | Guía de subagentes de cero a experto (ver [📘 Lecturas](#-lecturas)). |
+
+#### Ejecutar HealthTrack
+
+```bash
+cd Tema_8/Proyecto_1/healthtrack-api
+npm install
+npm run db:seed
+npm run dev          # http://localhost:3000
+npm test
+```
+
+---
+
 ## 🛠️ Requisitos generales
 
 - [Claude Code](https://docs.claude.com/en/docs/claude-code/overview)
-- Python 3.12 o superior (`Tema_1`, `Tema_5`)
-- Node.js 22 o superior (`Tema_2`, `Tema_3`, `Tema_6`)
+- Python 3.12 o superior (`Tema_1`, `Tema_5`, `Tema_7`)
+- Node.js 22 o superior (`Tema_2`, `Tema_3`, `Tema_6`, `Tema_8`)
 - Git
 - Para la sección 7: token de GitHub para el MCP de GitHub y `mcp-server-sqlite` (Python) para el MCP de SQLite
 
@@ -287,7 +364,9 @@ Claude/
 ├── Lecturas/                        # Material teórico por sección
 │   ├── Escribir instrucciones efectivas en CLAUDE.md
 │   ├── Seccion 5/                   # Memoria: auto memory, reglas modulares, glob
-│   └── Seccion 6/                   # Permisos, hooks, sandboxing y MCP (+ checklist de seguridad)
+│   ├── Seccion 6/                   # Permisos, hooks, sandboxing y MCP (+ checklist de seguridad)
+│   ├── Seccion 8/                   # Hooks: eventos, matchers y guía de cero a experto
+│   └── Seccion 9/                   # Subagentes: de cero a experto
 ├── Tema_1/                          # Sección 2 · Introducción a Claude
 │   ├── proyecto_1_prompt.txt
 │   ├── proyecto_final_prompts.txt
@@ -310,8 +389,20 @@ Claude/
 │   └── Proyecto_1/                  # PixelForge (Python + Pillow)
 │       ├── .claude/settings.json    # Reglas allow/deny + hook
 │       └── scripts/protect-originals.sh
-└── Tema_6/                          # Sección 7 · Servidores MCP
-    ├── prompt_mcp_github.txt
-    ├── prompts_kohi.txt
-    └── Proyecto_1/                  # Kōhi (Express + SQLite + HTML vanilla)
+├── Tema_6/                          # Sección 7 · Servidores MCP
+│   ├── prompt_mcp_github.txt
+│   ├── prompts_kohi.txt
+│   └── Proyecto_1/                  # Kōhi (Express + SQLite + HTML vanilla)
+├── Tema_7/                          # Sección 8 · Hooks
+│   ├── prompt_proyecto_tema.txt
+│   └── Proyecto_1/payflow-api/      # PayFlow (FastAPI + aiosqlite)
+│       ├── .claude/settings.json    # Hooks command, prompt, agent y http
+│       └── .claude/hooks/security_gate.py
+└── Tema_8/                          # Sección 9 · Subagentes
+    └── Proyecto_1/
+        ├── prompt_exploracion_subagentes.txt
+        ├── prompt_subagente_security_reviewer.txt
+        └── healthtrack-api/         # HealthTrack (Express + TypeScript + SQLite)
+            ├── .claude/agents/      # security-reviewer, test-engineer, api-documenter, db-analyst
+            └── .claude/agent-memory/
 ```
