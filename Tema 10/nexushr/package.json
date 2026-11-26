@@ -1,0 +1,20 @@
+{
+  "name": "nexushr",
+  "version": "1.0.0",
+  "description": "NexusHR - Modern HR Management Platform",
+  "main": "server.js",
+  "scripts": {
+    "build": "node --env-file-if-exists=.env build.mjs",
+    "typecheck": "tsc --noEmit -p .",
+    "prestart": "npm run build",
+    "start": "node --env-file-if-exists=.env server.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.119.2",
+    "express": "4.22.1"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "typescript": "7.0.2"
+  }
+}

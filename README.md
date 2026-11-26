@@ -19,6 +19,7 @@ Las secciones prácticas tienen su propia carpeta (`Tema_N/`) con los prompts qu
 | 8 | [Hooks y automatización basada en eventos](#8-hooks-y-automatización-basada-en-eventos) | [`Tema_7/`](Tema_7/) · [`Lecturas/Seccion 8/`](Lecturas/Seccion%208/) | ✅ Completado |
 | 9 | [Subagentes](#9-subagentes) | [`Tema_8/`](Tema_8/) · [`Lecturas/Seccion 9/`](Lecturas/Seccion%209/) | ✅ Completado |
 | 10 | [Skills y plugins](#10-skills-y-plugins) | [`Tema_9/`](Tema_9/) · [`Lecturas/Seccion 10/`](Lecturas/Seccion%2010/) | 🚧 En curso |
+| 11 | [Seguridad en el desarrollo con IA](#11-seguridad-en-el-desarrollo-con-ia) | [`Lecturas/Seccion 11/`](Lecturas/Seccion%2011/) | 🚧 En curso |
 
 ---
 
@@ -46,6 +47,21 @@ Material teórico de cada sección, ubicado en [`Lecturas/`](Lecturas/).
 | 10 | 🧩 [Skills vs Subagentes vs Memoria vs Hooks](Lecturas/Seccion%2010/Skills%20vs%20Subagentes%20vs%20Memoria%20vs%20Hooks.md) | Diferencias entre las cuatro piezas: la memoria dice **qué es verdad**, la skill **cómo se hace**, el subagente **quién lo hace** y el hook **qué ocurre siempre**. |
 | 10 | 🧩 [Campos de configuración de una Skill — De cero a avanzado](Lecturas/Seccion%2010/Campos%20de%20configuracion%20de%20una%20Skill%20-%20De%20cero%20a%20avanzado.md) | Frontmatter campo por campo (`description`, `disable-model-invocation`, `argument-hint`, `allowed-tools`, `model`, `paths`, `context: fork`…), archivos de soporte, hooks locales y recetario. |
 | 10 | 📦 [Plugins en Claude Code — De cero a experto](Lecturas/Seccion%2010/Plugins%20en%20Claude%20Code%20-%20De%20cero%20a%20experto.md) | Estructura de un plugin (`.claude-plugin/plugin.json`, `skills/`, `agents/`, `hooks/`, `bin/`, `.mcp.json`, `.lsp.json`), namespacing, pruebas locales, marketplaces, plugins de equipo, versionado y seguridad. |
+| 11 | ⚠️ [Patrones peligrosos del código generado por IA](Lecturas/Seccion%2011/Patrones%20peligrosos%20del%20codigo%20generado%20por%20IA.md) | Los siete fallos típicos del código de backend generado por IA (auth olvidada, SQL injection, secretos hardcodeados, error leaking, validación ausente, CORS abierto, permisos planos/IDOR), con su corrección y checklist. |
+| 11 | 🔌 [Ciberseguridad en MCP — De cero a experto](Lecturas/Seccion%2011/Ciberseguridad%20en%20MCP%20-%20De%20cero%20a%20experto.md) | Inyección indirecta, tool poisoning, rug pull, tool shadowing, cadena de suministro, confused deputy, SSRF/DNS rebinding, trifecta letal, permisos `mcp__*` y cómo construir un servidor seguro. |
+| 11 | 💬 [Ciberseguridad en Prompts — De cero a experto](Lecturas/Seccion%2011/Ciberseguridad%20en%20Prompts%20-%20De%20cero%20a%20experto.md) | OWASP LLM Top 10, prompt injection directa e indirecta, jailbreaks, fuga del system prompt, exfiltración por markdown, defensa en capas, `CLAUDE.md` como vector y red teaming. |
+| 11 | 🧩 [Ciberseguridad en Skills y Plugins — De cero a experto](Lecturas/Seccion%2011/Ciberseguridad%20en%20Skills%20y%20Plugins%20-%20De%20cero%20a%20experto.md) | Instrucciones ocultas en `SKILL.md`, `allowed-tools` amplio, hooks y MCP empaquetados, marketplaces, cómo auditar un plugin y políticas de organización. |
+| 11 | 🪝 [Ciberseguridad en Hooks — De cero a experto](Lecturas/Seccion%2011/Ciberseguridad%20en%20Hooks%20-%20De%20cero%20a%20experto.md) | El hook como riesgo y como defensa: scripts para bloquear comandos peligrosos, proteger archivos, detectar secretos, auditoría y límites. |
+| 11 | 🤖 [Ciberseguridad en Subagentes — De cero a experto](Lecturas/Seccion%2011/Ciberseguridad%20en%20Subagentes%20-%20De%20cero%20a%20experto.md) | Mínimo privilegio por rol, herencia de `tools`, propagación de inyecciones entre agentes, agente lector en cuarentena y equipo de revisión de seguridad. |
+| 11 | 🔐 [Ciberseguridad en Permisos, Sandbox y Secretos — De cero a experto](Lecturas/Seccion%2011/Ciberseguridad%20en%20Permisos%2C%20Sandbox%20y%20Secretos%20-%20De%20cero%20a%20experto.md) | Reglas allow/ask/deny, jerarquía de settings, configuración base segura, sandbox, devcontainers, managed settings, CI/CD y modelo de amenazas completo. |
+| 11 | 📦 [Dependencias sugeridas por IA (slopsquatting) — De cero a experto](Lecturas/Seccion%2011/Dependencias%20sugeridas%20por%20IA%20%28slopsquatting%29%20-%20De%20cero%20a%20experto.md) | Paquetes alucinados, slopsquatting, typosquatting, dependency confusion, scripts de instalación, npm y NuGet seguros, lockfiles, SBOM y hook para verificar paquetes. |
+| 11 | 🕵️ [Privacidad y datos sensibles con IA — De cero a experto](Lecturas/Seccion%2011/Privacidad%20y%20datos%20sensibles%20con%20IA%20-%20De%20cero%20a%20experto.md) | Qué datos salen al proveedor y cuáles quedan en disco, minimización, anonimización y datos sintéticos, enmascaramiento en SQL Server, Ley 1581/GDPR y política de clasificación. |
+| 11 | 🧠 [Envenenamiento de memoria — De cero a experto](Lecturas/Seccion%2011/Envenenamiento%20de%20memoria%20-%20De%20cero%20a%20experto.md) | `CLAUDE.md`, auto memory, reglas, imports y memoria de subagentes como vector de inyección persistente; revisión, permisos, CODEOWNERS y auditoría en CI. |
+| 11 | 🌐 [Agentes con navegador — De cero a experto](Lecturas/Seccion%2011/Agentes%20con%20navegador%20-%20De%20cero%20a%20experto.md) | Playwright MCP y Claude in Chrome: trifecta letal, abuso de sesiones, exfiltración por navegación, perfil aislado, dominios permitidos y E2E seguro. |
+| 11 | 🛡️ [Revisión de seguridad asistida por IA — De cero a experto](Lecturas/Seccion%2011/Revision%20de%20seguridad%20asistida%20por%20IA%20-%20De%20cero%20a%20experto.md) | `/security-review`, prompts de revisión con cobertura explícita, STRIDE, combinación con SAST/SCA/secretos, triaje de hallazgos y tests de regresión. |
+| 11 | 🧱 [OWASP Top 10 web y API en Node y .NET — De cero a experto](Lecturas/Seccion%2011/OWASP%20Top%2010%20web%20y%20API%20en%20Node%20y%20.NET%20-%20De%20cero%20a%20experto.md) | Las dos listas OWASP aplicadas a Express y ASP.NET Core: IDOR, mass assignment, JWT, criptografía, rate limiting, inyecciones, SSRF, deserialización, cabeceras y logging. |
+| 11 | ⚙️ [Seguridad en CI/CD con Claude — De cero a experto](Lecturas/Seccion%2011/Seguridad%20en%20CI-CD%20con%20Claude%20-%20De%20cero%20a%20experto.md) | Modo headless, input no confiable en eventos de GitHub, `pull_request_target`, permisos del token, `--allowedTools`, separar análisis y acción, y Azure DevOps. |
+| 11 | 🏗️ [Seguridad en aplicaciones con la API de Claude — De cero a experto](Lecturas/Seccion%2011/Seguridad%20en%20aplicaciones%20con%20la%20API%20de%20Claude%20-%20De%20cero%20a%20experto.md) | API key, salida como input no confiable, tool use con autorización por sesión, confirmación de acciones, envenenamiento de RAG, aislamiento multi-tenant y control de costes. |
 
 ---
 
@@ -359,6 +375,31 @@ npm test
 
 ---
 
+## 11. Seguridad en el desarrollo con IA
+
+Por qué el código generado por IA suele funcionar pero no ser seguro, y cómo proteger cada pieza de Claude Code (prompts, MCP, skills, plugins, hooks, subagentes, permisos y secretos) frente a prompt injection, cadena de suministro y fuga de datos. La teoría está en [`Lecturas/Seccion 11/`](Lecturas/Seccion%2011/).
+
+### Temas abordados
+
+- **Patrones peligrosos del código generado por IA**: la IA optimiza el *happy path* y omite auth, autorización, validación, manejo de errores, CORS y gestión de secretos.
+- **Prompt injection directa e indirecta**: por qué no tiene solución definitiva y cómo limitar su impacto con defensa en capas.
+- **Seguridad en MCP**: tool poisoning, rug pull, tool shadowing, confused deputy y la trifecta letal.
+- **Skills, plugins y subagentes**: revisar lo que se instala, mínimo privilegio en `allowed-tools` / `tools` y aislamiento de contenido no confiable.
+- **Hooks como garantía**: bloquear comandos, archivos sensibles y secretos de forma determinista.
+- **Permisos, sandbox y secretos**: `deny` siempre gana, sandbox a nivel de SO, managed settings y uso seguro en CI/CD.
+- **Dependencias y privacidad**: paquetes alucinados por la IA (slopsquatting), lockfiles y SBOM; minimización, anonimización y cumplimiento (Ley 1581, GDPR).
+- **Memoria y navegador**: envenenamiento persistente de `CLAUDE.md` y auto memory; agentes con navegador en perfiles aislados.
+- **Revisión y OWASP**: `/security-review`, STRIDE, SAST, y OWASP Top 10 web/API aplicado a Express y ASP.NET Core.
+- **CI/CD y aplicaciones propias**: Claude en pipelines sin exponer secretos, y seguridad al construir sobre la API de Claude (tool use, RAG, multi-tenant, costes).
+
+### Contenido
+
+| Archivo / carpeta | Descripción |
+|---|---|
+| [`Lecturas/Seccion 11/`](Lecturas/Seccion%2011/) | Quince lecturas de ciberseguridad aplicada a Claude Code (ver [📘 Lecturas](#-lecturas)). |
+
+---
+
 ## 🛠️ Requisitos generales
 
 - [Claude Code](https://docs.claude.com/en/docs/claude-code/overview)
@@ -405,7 +446,8 @@ Claude/
 │   ├── Seccion 6/                   # Permisos, hooks, sandboxing y MCP (+ checklist de seguridad)
 │   ├── Seccion 8/                   # Hooks: eventos, matchers y guía de cero a experto
 │   ├── Seccion 9/                   # Subagentes: de cero a experto
-│   └── Seccion 10/                  # Skills, plugins y comparación entre piezas
+│   ├── Seccion 10/                  # Skills, plugins y comparación entre piezas
+│   └── Seccion 11/                  # Ciberseguridad: código IA, prompts, MCP, skills, hooks, subagentes, permisos, dependencias, privacidad, memoria, navegador, OWASP, CI/CD, API
 ├── Tema_1/                          # Sección 2 · Introducción a Claude
 │   ├── proyecto_1_prompt.txt
 │   ├── proyecto_final_prompts.txt

@@ -1,0 +1,29 @@
+Vamos a migrar nexushr de auth casera a Supabase Auth + RLS.
+
+## Paso 1: Setup de Supabase
+- Instala @supabase/supabase-js
+- Crea src/lib/supabase.ts con el cliente configurado
+- Las credenciales (SUPABASE_URL y SUPABASE_ANON_KEY) deben venir
+  de variables de entorno, NUNCA hardcodeadas
+
+## Paso 2: Eliminar auth casera
+- Elimina toda la lógica de JWT, bcrypt, login/register manuales
+- Elimina la tabla users de SQLite
+- El frontend debe usar supabase.auth.signUp(), signInWithPassword(),
+  signOut(), onAuthStateChange()
+
+## Paso 3: Migrar la base de datos
+- Crea un archivo supabase/schema.sql con el schema completo
+  (profiles, folders, notes, note_shares)
+- Incluye TODAS las políticas RLS que te proporcionaré
+- El frontend usa supabase.from('notes').select() directamente
+  (la API REST de Supabase es automática)
+
+## Paso 4: Actualizar el frontend
+- Login/registro con Supabase Auth (email + password)
+- Todas las queries de datos via supabase client
+- No más fetch() a tu API Express para datos
+  (Express solo sirve el HTML estático ahora)
+
+## Paso 5: Verificar seguridad
+- Ejecuta /custom-security-review sobre los ficheros que han cambiado para confirmar
